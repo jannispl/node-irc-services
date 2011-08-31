@@ -21,10 +21,19 @@ irc.Channel.prototype._eval = function (code, service, bot, user)
 }
 
 var s = new irc.Service(new irc.UnrealProtocol({ password: 'nodejs', numeric: 78, serviceHost: 'service.node.js' }));
+
+function cleanup()
+{
+	s.disconnect("User request");
+}
+
 with (s)
 {
 	connect("localhost", 6667, function ()
 	{
+		process.once('SIGINT', cleanup);
+		process.once('SIGTERM', cleanup);
+		
 		var b = createBot("nodebot", "nodejs", "node.js bot", "bot.node.js");
 		b.join("#mave");
 		
