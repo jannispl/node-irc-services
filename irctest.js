@@ -22,8 +22,12 @@ irc.Channel.prototype._eval = function (code, service, bot, user)
 
 var s = new irc.Service(new irc.UnrealProtocol({ password: 'nodejs', numeric: 78, serviceHost: 'service.node.js' }));
 
+var done = false;
 function cleanup()
 {
+	if (done) { return; }
+	done = true;
+	
 	s.disconnect("User request");
 }
 
@@ -33,6 +37,7 @@ with (s)
 	{
 		process.once('SIGINT', cleanup);
 		process.once('SIGTERM', cleanup);
+		process.once('exit', cleanup);
 		
 		var b = createBot("nodebot", "nodejs", "node.js bot", "bot.node.js");
 		b.join("#mave");
@@ -56,7 +61,7 @@ with (s)
 			}
 			
 			var chan = params[0];
-			if (chan.charAt(0) != "#")
+			if (chan[0] != "#")
 			{
 				return;
 			}
@@ -68,11 +73,13 @@ with (s)
 			
 			var msg = params[1];
 			
-			if (msg.substr(0, 1) == "%")
+			var trigger = "%";
+			
+			if (msg.substr(0, trigger.length) == trigger)
 			{
 				try
 				{
-					var e = c._eval(msg.substr(1).trim(), s, b, u);
+					var e = c._eval(msg.substr(trigger.length).trim(), s, b, u);
 					
 					if (e != undefined)
 					{
