@@ -1,9 +1,5 @@
 var irc = require("./lib/irc");
 
-console.dir(irc.Channel);
-
-console.dir(irc.Channel.prototype);
-
 irc.Channel.prototype._eval = function (code, service, bot, user)
 {
 	// doesn't quite work.
